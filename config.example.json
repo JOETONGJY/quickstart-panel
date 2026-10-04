@@ -1,0 +1,10 @@
+{
+  "title": "QuickStart",
+  "avatar": "",
+  "launchIntervalMs": 700,
+  "apps": [
+    { "name": "Microsoft Edge", "exe": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "process": "msedge", "args": "" },
+    { "name": "Notepad",        "exe": "C:\\Windows\\System32\\notepad.exe",                                "process": "notepad", "args": "" },
+    { "name": "File Explorer",  "exe": "explorer.exe",                                                      "process": "explorer", "args": "" }
+  ]
+}
