@@ -56,13 +56,14 @@ function Invoke-App($app) {
         return 'focus'
     }
     if (-not (Test-Path $app.exe)) { return 'missing' }
-    # launch via explicit ShellExecute: fully detached from this console/process —
-    # no inherited handles, so closing the panel can never kill launched apps
-    $psi           = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName  = $app.exe
-    if ($app.args) { $psi.Arguments = $app.args }
-    $psi.UseShellExecute = $true
-    [System.Diagnostics.Process]::Start($psi) | Out-Null
+    # launch via WMI Win32_Process.Create: the spawned process is parented to
+    # WmiPrvSE (system service), fully severed from this panel — no handle or
+    # console relationship survives, no matter how the console is hosted
+    # (conhost / Windows Terminal) and no matter what the app does on startup
+    # (some Electron launchers AttachConsole to the parent and pin it alive).
+    $cmdline = '"' + $app.exe + '"'
+    if ($app.args) { $cmdline += ' ' + $app.args }
+    Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmdline } | Out-Null
     return 'start'
 }
 
