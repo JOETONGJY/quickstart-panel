@@ -56,8 +56,13 @@ function Invoke-App($app) {
         return 'focus'
     }
     if (-not (Test-Path $app.exe)) { return 'missing' }
-    if ($app.args) { Start-Process -FilePath $app.exe -ArgumentList $app.args | Out-Null }
-    else           { Start-Process -FilePath $app.exe | Out-Null }
+    # launch via explicit ShellExecute: fully detached from this console/process —
+    # no inherited handles, so closing the panel can never kill launched apps
+    $psi           = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName  = $app.exe
+    if ($app.args) { $psi.Arguments = $app.args }
+    $psi.UseShellExecute = $true
+    [System.Diagnostics.Process]::Start($psi) | Out-Null
     return 'start'
 }
 
